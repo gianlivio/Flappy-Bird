@@ -10,7 +10,7 @@ const bird = {
     height: 30,
     velocity: 0,
     gravity: 0.5,
-    jumpStrength: -8
+    jumpStrength: -9
 };
 
 const game = {
@@ -38,7 +38,8 @@ function jump() {
         game.isRunning = true;
         gameLoop();
     }
-    bird.velocity = bird.jumpStrength;
+    // Prevent immediate falling by setting a minimum velocity
+    bird.velocity = Math.min(bird.velocity, bird.jumpStrength);
 }
 
 function createPipe() {
@@ -61,9 +62,7 @@ function drawBird() {
 
 function drawPipes(pipe) {
     ctx.fillStyle = "#ff00ff";
-    // Top pipe
     ctx.fillRect(pipe.x, 0, game.pipeWidth, pipe.topHeight);
-    // Bottom pipe
     ctx.fillRect(pipe.x, canvas.height - pipe.bottomHeight, game.pipeWidth, pipe.bottomHeight);
 }
 
@@ -143,15 +142,13 @@ document.getElementById("start-btn").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-    if (event.code === "Space" && game.isRunning) {
-        jump();
-    }
-});
-
-document.addEventListener("keydown", (event) => {
-    if (event.code === "Space" && !game.isRunning) {
-        resetGame();
-        jump();
+    if (event.code === "Space") {
+        if (!game.isRunning) {
+            resetGame();
+            jump();
+        } else {
+            jump();
+        }
     }
 });
 
