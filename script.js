@@ -1,9 +1,9 @@
-        const canvas = document.getElementById("gameCanvas");
+                const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         canvas.width = 400;
         canvas.height = 600;
 
-        let bird = { x: 50, y: 150, width: 20, height: 20, velocity: 0, gravity: 0.6, jump: -10 };
+        let bird = { x: 50, y: 150, width: 20, height: 20, velocity: 0, gravity: 0.3, jump: -6 };
         let pipes = [];
         let score = 0;
         let gameRunning = false;
@@ -35,10 +35,10 @@
                 return;
             }
 
-            if (Math.random() < 0.02) pipes.push({ x: canvas.width, y: Math.random() * (canvas.height - 150) });
+            if (Math.random() < 0.05) pipes.push({ x: canvas.width, y: Math.random() * (canvas.height - 150) });
 
             pipes.forEach(pipe => {
-                pipe.x -= 3;
+                pipe.x -= 4;
                 ctx.fillStyle = "#ff00ff";
                 ctx.fillRect(pipe.x, 0, 40, pipe.y);
                 ctx.fillRect(pipe.x, pipe.y + 100, 40, canvas.height - pipe.y);
