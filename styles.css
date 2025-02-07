@@ -1,58 +1,152 @@
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        
-        body {
-            background: #0a0a0a;
-            color: #00ffcc;
-            font-family: 'Press Start 2P', cursive;
-            text-align: center;
-            margin: 0;
-            overflow: hidden;
-        }
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Press+Start+2P&display=swap');
 
-        .game-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+:root {
+    --primary-color: #00ffcc;
+    --secondary-color: #ff00ff;
+    --background-color: #0a0a0a;
+    --accent-color: #00ffff;
+}
 
-        h1 {
-            font-size: 2rem;
-            text-shadow: 0px 0px 8px #00ffcc;
-            animation: glitch 1.5s infinite alternate;
-        }
+body {
+    background: linear-gradient(45deg, #0a0a0a, #1a1a2a);
+    color: var(--primary-color);
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    margin: 0;
+    overflow: hidden;
+    perspective: 1000px;
+    cursor: none; /* Custom cursor coming */
+}
 
-        @keyframes glitch {
-            0% { text-shadow: 4px 4px 0px #ff00ff, -4px -4px 0px #00ffff; }
-            100% { text-shadow: -4px -4px 0px #ff00ff, 4px 4px 0px #00ffff; }
-        }
+.game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, rgba(0,255,204,0.1), rgba(0,0,0,0.8));
+    transform-style: preserve-3d;
+}
 
-        canvas {
-            background: rgba(0, 255, 204, 0.1);
-            border: 4px solid #00ffcc;
-            box-shadow: 0px 0px 20px #00ffcc;
-        }
+h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2.5rem;
+    text-shadow: 
+        0 0 10px var(--primary-color),
+        0 0 20px var(--secondary-color),
+        0 0 40px var(--accent-color);
+    animation: 
+        glitch 1.5s infinite alternate,
+        cyber-flicker 0.1s infinite alternate;
+    letter-spacing: 3px;
+}
 
-        .score {
-            font-size: 1.5rem;
-            margin-top: 10px;
-        }
+@keyframes glitch {
+    0% { 
+        transform: translate(-2px, -2px) skew(-3deg);
+        text-shadow: 4px 4px 0px var(--secondary-color), -4px -4px 0px var(--accent-color);
+    }
+    50% { 
+        transform: translate(2px, 2px) skew(2deg);
+        text-shadow: -4px -4px 0px var(--secondary-color), 4px 4px 0px var(--accent-color);
+    }
+}
 
-        button {
-            background: #ff00ff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            box-shadow: 0px 0px 10px #ff00ff;
-            transition: 0.3s;
-        }
+@keyframes cyber-flicker {
+    0% { opacity: 0.9; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0.95; }
+}
 
-        button:hover {
-            background: #00ffff;
-            box-shadow: 0px 0px 15px #00ffff;
-        }
+canvas {
+    background: rgba(0, 255, 204, 0.05);
+    border: 4px solid var(--primary-color);
+    box-shadow: 
+        0 0 10px var(--primary-color),
+        0 0 20px var(--secondary-color),
+        0 0 40px var(--accent-color);
+    transition: all 0.3s ease;
+    will-change: box-shadow, transform;
+}
+
+canvas:hover {
+    transform: scale(1.02) rotate3d(1, 1, 0, 5deg);
+    box-shadow: 
+        0 0 20px var(--primary-color),
+        0 0 40px var(--secondary-color),
+        0 0 80px var(--accent-color);
+}
+
+.score {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    margin-top: 15px;
+    text-shadow: 0 0 10px var(--primary-color);
+    letter-spacing: 2px;
+}
+
+button {
+    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+    color: var(--background-color);
+    border: 2px solid var(--primary-color);
+    padding: 12px 24px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 0 10px var(--secondary-color),
+        0 0 20px var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+button:hover {
+    transform: scale(1.05) rotate(2deg);
+    box-shadow: 
+        0 0 20px var(--secondary-color),
+        0 0 40px var(--accent-color);
+}
+
+button:active {
+    transform: scale(0.95);
+    filter: brightness(1.2);
+}
+
+/* Digital noise overlay */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+    
+    .score {
+        font-size: 1.5rem;
+    }
+    
+    button {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}
