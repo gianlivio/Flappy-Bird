@@ -13,12 +13,13 @@ const canvas = document.getElementById("gameCanvas");
         document.addEventListener("keydown", () => { if (gameRunning) bird.velocity = bird.jump; });
         
         function startGame() {
-            pipes = [];
-            score = 0;
-            bird.y = 150;
-            bird.velocity = 0;
-            gameRunning = true;
-            gameLoop();
+                pipes = [];
+                    score = 0;
+                    bird.y = 150;
+                    bird.velocity = 0;
+                    document.getElementById("score").textContent = score; 
+                    gameRunning = true;
+                    gameLoop();
         }
         
         function gameLoop() {
