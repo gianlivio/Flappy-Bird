@@ -34,12 +34,14 @@ function resetGame() {
 }
 
 function jump() {
+    bird.velocity = bird.jumpStrength;
+}
+
+function startGame() {
     if (!game.isRunning) {
         game.isRunning = true;
         gameLoop();
     }
-    // Prevent immediate falling by setting a minimum velocity
-    bird.velocity = Math.min(bird.velocity, bird.jumpStrength);
 }
 
 function createPipe() {
@@ -134,29 +136,20 @@ function endGame() {
 }
 
 // Event Listeners
-document.getElementById("start-btn").addEventListener("click", () => {
-    if (!game.isRunning) {
-        resetGame();
-        jump();
-    }
-});
+document.getElementById("start-btn").addEventListener("click", startGame);
 
 document.addEventListener("keydown", (event) => {
     if (event.code === "Space") {
         if (!game.isRunning) {
-            resetGame();
-            jump();
-        } else {
-            jump();
+            startGame();
         }
+        jump();
     }
 });
 
 canvas.addEventListener("click", () => {
     if (!game.isRunning) {
-        resetGame();
-        jump();
-    } else {
-        jump();
+        startGame();
     }
+    jump();
 });
