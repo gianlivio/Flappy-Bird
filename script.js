@@ -29,6 +29,7 @@ function resetGame() {
     game.pipes = [];
     game.score = 0;
     game.frameCount = 0;
+    game.isRunning = false;
     document.getElementById("score").textContent = game.score;
 }
 
@@ -36,7 +37,6 @@ function jump() {
     if (!game.isRunning) {
         game.isRunning = true;
         gameLoop();
-        return;
     }
     bird.velocity = bird.jumpStrength;
 }
@@ -72,13 +72,13 @@ function checkCollision(pipe) {
     const birdBottom = bird.y + bird.height;
     const pipeRight = pipe.x + game.pipeWidth;
 
-    const hitTopPipe = bird.x < pipeRight && 
-                       birdRight > pipe.x && 
+    const hitTopPipe = birdRight > pipe.x && 
+                       bird.x < pipeRight && 
                        bird.y < pipe.topHeight;
 
-    const hitBottomPipe = bird.x < pipeRight && 
-                          birdBottom > canvas.height - pipe.bottomHeight &&
-                          birdRight > pipe.x;
+    const hitBottomPipe = birdRight > pipe.x && 
+                          bird.x < pipeRight && 
+                          birdBottom > canvas.height - pipe.bottomHeight;
 
     return hitTopPipe || hitBottomPipe || bird.y + bird.height > canvas.height || bird.y < 0;
 }
@@ -94,12 +94,13 @@ function gameLoop() {
 
     // Pipe generation
     game.frameCount++;
-    if (game.frameCount % 120 === 0) {
+    if (game.pipes.length === 0 || game.frameCount % 120 === 0) {
         game.pipes.push(createPipe());
     }
 
     // Update and draw pipes
-    game.pipes.forEach((pipe, index) => {
+    for (let i = game.pipes.length - 1; i >= 0; i--) {
+        const pipe = game.pipes[i];
         pipe.x -= game.speed;
         drawPipes(pipe);
 
@@ -115,10 +116,12 @@ function gameLoop() {
             pipe.passed = true;
             document.getElementById("score").textContent = game.score;
         }
-    });
 
-    // Remove offscreen pipes
-    game.pipes = game.pipes.filter(pipe => pipe.x + game.pipeWidth > 0);
+        // Remove offscreen pipes
+        if (pipe.x + game.pipeWidth < 0) {
+            game.pipes.splice(i, 1);
+        }
+    }
 
     // Draw bird
     drawBird();
@@ -140,9 +143,23 @@ document.getElementById("start-btn").addEventListener("click", () => {
 });
 
 document.addEventListener("keydown", (event) => {
-    if (event.code === "Space") {
+    if (event.code === "Space" && game.isRunning) {
         jump();
     }
 });
 
-canvas.addEventListener("click", jump);
+document.addEventListener("keydown", (event) => {
+    if (event.code === "Space" && !game.isRunning) {
+        resetGame();
+        jump();
+    }
+});
+
+canvas.addEventListener("click", () => {
+    if (!game.isRunning) {
+        resetGame();
+        jump();
+    } else {
+        jump();
+    }
+});
