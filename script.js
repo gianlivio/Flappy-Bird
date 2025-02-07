@@ -1,4 +1,4 @@
-const canvas = document.getElementById("gameCanvas");
+        const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         canvas.width = 400;
         canvas.height = 600;
@@ -39,14 +39,14 @@ const canvas = document.getElementById("gameCanvas");
             }
 
             // Generazione tubi con spazio fisso e distanza minima
-            if (Math.random() < 0.02 && (lastPipeX === 0 || canvas.width - lastPipeX > 200)) {
+            if (Math.random() < 0.1 && (lastPipeX === 0 || canvas.width - lastPipeX > 200)) {
                 let pipeY = Math.random() * (canvas.height - pipeGap - 100) + 50;
                 pipes.push({ x: canvas.width, y: pipeY });
                 lastPipeX = canvas.width;
             }
 
             pipes.forEach(pipe => {
-                pipe.x -= 4;
+                pipe.x -= 3;
                 ctx.fillStyle = "#ff00ff";
                 ctx.fillRect(pipe.x, 0, 40, pipe.y);
                 ctx.fillRect(pipe.x, pipe.y + pipeGap, 40, canvas.height - pipe.y - pipeGap);
