@@ -1,5 +1,8 @@
 const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        canvas.width = 400;
+        canvas.height = 600;
+
         
         let bird = { x: 50, y: 150, width: 20, height: 20, velocity: 0, gravity: 0.6, jump: -10 };
         let pipes = [];
