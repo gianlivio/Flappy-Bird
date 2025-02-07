@@ -10,7 +10,10 @@ const canvas = document.getElementById("gameCanvas");
         let gameRunning = false;
         
         document.getElementById("start-btn").addEventListener("click", startGame);
-        document.addEventListener("keydown", () => { if (gameRunning) bird.velocity = bird.jump; });
+        document.addEventListener("keydown", (event) => {
+    if (!gameRunning) startGame(); // Se il gioco non è in corso, avvialo
+    bird.velocity = bird.jump; // Esegui il salto
+});
         
         function startGame() {
                 pipes = [];
