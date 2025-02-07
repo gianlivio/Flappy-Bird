@@ -18,6 +18,34 @@
             }
         });
 
+function generatePipe() {
+    const minHeight = 50;
+    const maxHeight = canvas.height - pipeGap - minHeight;
+    let pipeY = Math.random() * (maxHeight - minHeight) + minHeight;
+    return { 
+        x: canvas.width, 
+        y: pipeY, 
+        width: 40,
+        passed: false 
+    };
+}
+
+function checkCollision(bird, pipe) {
+    return (
+        bird.x < pipe.x + pipe.width &&
+        bird.x + bird.width > pipe.x &&
+        (bird.y < pipe.y || bird.y + bird.height > pipe.y + pipeGap)
+    );
+}
+
+function updateScore(bird, pipe) {
+    if (!pipe.passed && bird.x > pipe.x + pipe.width) {
+        score++;
+        pipe.passed = true;
+        document.getElementById("score").textContent = score;
+    }
+}
+
         function startGame() {
             pipes = [];
             score = 0;
