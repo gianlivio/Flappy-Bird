@@ -5,52 +5,64 @@ canvas.height = 600;
 
 let bird = { 
     x: 50, 
-    y: 150, 
+    y: 300, 
     width: 20, 
     height: 20, 
     velocity: 0, 
-    gravity: 0.3, 
-    jump: -6 
+    gravity: 0.5, 
+    jump: -8 
 };
 
 let pipes = [];
 let score = 0;
 let gameRunning = false;
-let lastPipeX = 0; 
-let pipeGap = 150; 
+let gameSpeed = 2;
+let pipeGap = 200;
+let pipeWidth = 50;
+
+function jump() {
+    if (gameRunning) {
+        bird.velocity = bird.jump;
+    }
+}
 
 document.getElementById("start-btn").addEventListener("click", startGame);
 document.addEventListener("keydown", (event) => {
-    if (event.code === "Space" && gameRunning) {
-        bird.velocity = bird.jump;
+    if (event.code === "Space") {
+        jump();
     }
 });
+canvas.addEventListener("click", jump);
 
-function checkCollision(bird, pipe) {
-    return (
-        bird.x < pipe.x + pipe.width &&
-        bird.x + bird.width > pipe.x &&
-        (bird.y < pipe.y || bird.y + bird.height > pipe.y + pipeGap)
-    );
-}
-
-function updateScore(bird, pipe) {
-    if (!pipe.passed && bird.x > pipe.x + pipe.width) {
-        score++;
-        pipe.passed = true;
-        document.getElementById("score").textContent = score;
-    }
+function createPipe() {
+    const minHeight = 50;
+    const maxHeight = canvas.height - pipeGap - minHeight;
+    const pipeHeight = Math.random() * (maxHeight - minHeight) + minHeight;
+    
+    return {
+        x: canvas.width,
+        topHeight: pipeHeight,
+        bottomHeight: canvas.height - pipeHeight - pipeGap,
+        passed: false
+    };
 }
 
 function startGame() {
     pipes = [];
     score = 0;
-    bird.y = 150;
+    bird.y = 300;
     bird.velocity = 0;
-    lastPipeX = 0;
     document.getElementById("score").textContent = score;
     gameRunning = true;
     gameLoop();
+}
+
+function checkCollision(bird, pipe) {
+    return (
+        bird.x < pipe.x + pipeWidth &&
+        bird.x + bird.width > pipe.x &&
+        (bird.y < pipe.topHeight || bird.y + bird.height > canvas.height - pipe.bottomHeight)
+    );
 }
 
 function gameLoop() {
@@ -62,47 +74,42 @@ function gameLoop() {
     bird.velocity += bird.gravity;
     bird.y += bird.velocity;
     
-    // Check for ground or ceiling collision
-    if (bird.y >= canvas.height - bird.height || bird.y <= 0) {
+    // Ground and ceiling collision
+    if (bird.y + bird.height > canvas.height || bird.y < 0) {
         endGame();
         return;
     }
     
-    // Generate pipes
-    if (pipes.length === 0 || (Math.random() < 0.05 && canvas.width - lastPipeX > 200)) {
-        const minHeight = 50;
-        const maxHeight = canvas.height - pipeGap - minHeight;
-        let pipeY = Math.random() * (maxHeight - minHeight) + minHeight;
-        pipes.push({ 
-            x: canvas.width, 
-            y: pipeY, 
-            width: 40,
-            passed: false 
-        });
-        lastPipeX = canvas.width;
+    // Pipe generation
+    if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 250) {
+        pipes.push(createPipe());
     }
     
     // Update and draw pipes
     pipes.forEach((pipe, index) => {
-        pipe.x -= 3;
+        pipe.x -= gameSpeed;
         
         // Draw pipes
         ctx.fillStyle = "#ff00ff";
-        ctx.fillRect(pipe.x, 0, 40, pipe.y);
-        ctx.fillRect(pipe.x, pipe.y + pipeGap, 40, canvas.height - pipe.y - pipeGap);
+        ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topHeight);
+        ctx.fillRect(pipe.x, canvas.height - pipe.bottomHeight, pipeWidth, pipe.bottomHeight);
         
-        // Check collision
+        // Collision detection
         if (checkCollision(bird, pipe)) {
             endGame();
             return;
         }
         
-        // Update score
-        updateScore(bird, pipe);
+        // Score tracking
+        if (!pipe.passed && pipe.x + pipeWidth < bird.x) {
+            score++;
+            pipe.passed = true;
+            document.getElementById("score").textContent = score;
+        }
     });
     
     // Remove offscreen pipes
-    pipes = pipes.filter(pipe => pipe.x > -40);
+    pipes = pipes.filter(pipe => pipe.x + pipeWidth > 0);
     
     // Draw bird
     ctx.fillStyle = "#00ffcc";
