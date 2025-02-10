@@ -1,13 +1,11 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// Responsive canvas sizing
 function resizeCanvas() {
     const container = document.querySelector('.game-container');
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
     
-    // Maintain aspect ratio
     const targetAspect = 400 / 600;
     let newWidth, newHeight;
     
@@ -37,6 +35,7 @@ const game = {
     pipes: [],
     score: 0,
     isRunning: false,
+    gameOver: false,
     speed: 2,
     pipeGap: 200,
     pipeWidth: 50,
@@ -50,18 +49,18 @@ function resetGame() {
     game.score = 0;
     game.frameCount = 0;
     game.isRunning = false;
+    game.gameOver = false;
     document.getElementById("score").textContent = game.score;
 }
 
 function jump() {
-    bird.velocity = bird.jumpStrength;
-}
-
-function startGame() {
+    if (game.gameOver) return;
+    
     if (!game.isRunning) {
         game.isRunning = true;
         gameLoop();
     }
+    bird.velocity = bird.jumpStrength;
 }
 
 function createPipe() {
@@ -152,15 +151,25 @@ function gameLoop() {
 
 function endGame() {
     game.isRunning = false;
+    game.gameOver = true;
     alert(`Game Over! Punteggio: ${game.score}`);
 }
 
 // Event Listeners for multiple input methods
 function handleStart() {
+    if (game.gameOver) {
+        resetGame();
+    }
+    
     if (!game.isRunning) {
         startGame();
     }
     jump();
+}
+
+function startGame() {
+    game.isRunning = true;
+    gameLoop();
 }
 
 // Desktop events
