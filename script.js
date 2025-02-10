@@ -1,163 +1,234 @@
-
-
-
-
-
-
-
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = 400;
-canvas.height = 600;
-
-const bird = {
-    x: 50,
-    y: 300,
-    width: 30,
-    height: 30,
-    velocity: 0,
-    gravity: 0.5,
-    jumpStrength: -9
-};
-
-const game = {
-    pipes: [],
-    score: 0,
-    isRunning: false,
-    speed: 2,
-    pipeGap: 200,
-    pipeWidth: 50,
-    frameCount: 0
-};
-
-function resetGame() {
-    bird.y = 300;
-    bird.velocity = 0;
-    game.pipes = [];
-    game.score = 0;
-    game.frameCount = 0;
-    game.isRunning = false;
-    document.getElementById("score").textContent = game.score;
-}
-
-function jump() {
-    bird.velocity = bird.jumpStrength;
-}
-
-function startGame() {
-    if (!game.isRunning) {
-        game.isRunning = true;
-        gameLoop();
-    }
-}
-
-function createPipe() {
-    const minHeight = 100;
-    const maxHeight = canvas.height - game.pipeGap - minHeight;
-    const topHeight = Math.random() * (maxHeight - minHeight) + minHeight;
+document.addEventListener('DOMContentLoaded', () => {
+    const cursor = document.querySelector('.custom-cursor');
+    const interactiveElements = document.querySelectorAll('a, .nav-link');
+    const bookTitle = document.querySelector('.book-section h2');
     
-    return {
-        x: canvas.width,
-        topHeight: topHeight,
-        bottomHeight: canvas.height - topHeight - game.pipeGap,
-        passed: false
+    const bookCover = document.createElement('div');
+    bookCover.className = 'book-cover';
+    document.body.appendChild(bookCover);
+
+
+    const homeLinks = document.querySelectorAll('.big-link');
+    const sectionImages = {
+        'developer': ['fizzbuzz', 'discord', 'train', 'dropbox', 'pizza'],
+        'music': ['malacarne', 'semeiosis'],
+        'writer': ['a', 'Licitra'] 
     };
-}
 
-function drawBird() {
-    ctx.fillStyle = "#00ffcc";
-    ctx.fillRect(bird.x, bird.y, bird.width, bird.height);
-}
+    homeLinks.forEach(link => {
+        const section = link.getAttribute('data-page');
+        if (sectionImages[section]) {
+            let currentImageIndex = 0;
+            let intervalId = null;
+            
+            // Creiamo un div per l'immagine hover
+            const hoverImage = document.createElement('div');
+            hoverImage.className = 'project-hover-image';
+            document.body.appendChild(hoverImage);
 
-function drawPipes(pipe) {
-    ctx.fillStyle = "#ff00ff";
-    ctx.fillRect(pipe.x, 0, game.pipeWidth, pipe.topHeight);
-    ctx.fillRect(pipe.x, canvas.height - pipe.bottomHeight, game.pipeWidth, pipe.bottomHeight);
-}
+            link.addEventListener('mouseenter', (e) => {
+                hoverImage.style.opacity = '1';
+                intervalId = setInterval(() => {
+                    currentImageIndex = (currentImageIndex + 1) % sectionImages[section].length;
+                    hoverImage.className = `project-hover-image ${sectionImages[section][currentImageIndex]}`;
+                    hoverImage.classList.add('flicker');
+                }, 400); // Cambia immagine ogni 400ms
+            });
 
-function checkCollision(pipe) {
-    const birdRight = bird.x + bird.width;
-    const birdBottom = bird.y + bird.height;
-    const pipeRight = pipe.x + game.pipeWidth;
+            link.addEventListener('mousemove', (e) => {
+                hoverImage.style.left = e.clientX + 'px';
+                hoverImage.style.top = e.clientY + 'px';
+            });
 
-    const hitTopPipe = birdRight > pipe.x && 
-                       bird.x < pipeRight && 
-                       bird.y < pipe.topHeight;
+            link.addEventListener('mouseleave', () => {
+                hoverImage.style.opacity = '0';
+                hoverImage.classList.remove('flicker');
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+                currentImageIndex = 0;
+            });
+        }
+    });
 
-    const hitBottomPipe = birdRight > pipe.x && 
-                          bird.x < pipeRight && 
-                          birdBottom > canvas.height - pipe.bottomHeight;
+    const styleSheet = document.styleSheets[0];
+    styleSheet.insertRule(`
+        .project-hover-image.a {
+            background-image: url('a.png');
+        }
+    `, styleSheet.cssRules.length);
+    styleSheet.insertRule(`
+        .project-hover-image.Licitra {
+            background-image: url('Licitra.png');
+        }
+    `, styleSheet.cssRules.length);
 
-    return hitTopPipe || hitBottomPipe || bird.y + bird.height > canvas.height || bird.y < 0;
-}
+    homeLinks.forEach(link => {
+        const section = link.getAttribute('data-page');
+        if (sectionImages[section]) {
+            let currentImageIndex = 0;
+            let intervalId = null;
+            
+            const hoverImage = document.createElement('div');
+            hoverImage.className = 'project-hover-image';
+            document.body.appendChild(hoverImage);
 
-function gameLoop() {
-    if (!game.isRunning) return;
+            link.addEventListener('mouseenter', (e) => {
+                hoverImage.style.opacity = '1';
+                intervalId = setInterval(() => {
+                    currentImageIndex = (currentImageIndex + 1) % sectionImages[section].length;
+                    hoverImage.className = `project-hover-image ${sectionImages[section][currentImageIndex]}`;
+                    hoverImage.classList.add('flicker');
+                }, 400);
+            });
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+            link.addEventListener('mousemove', (e) => {
+                hoverImage.style.left = e.clientX + 'px';
+                hoverImage.style.top = e.clientY + 'px';
+            });
 
-    // Bird physics
-    bird.velocity += bird.gravity;
-    bird.y += bird.velocity;
+            link.addEventListener('mouseleave', () => {
+                hoverImage.style.opacity = '0';
+                hoverImage.classList.remove('flicker');
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+                currentImageIndex = 0;
+            });
+        }
+    });
 
-    // Pipe generation
-    game.frameCount++;
-    if (game.pipes.length === 0 || game.frameCount % 120 === 0) {
-        game.pipes.push(createPipe());
+
+    document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+
+
+    });
+    
+    if (bookTitle) {
+        bookTitle.addEventListener('mousemove', (e) => {
+            bookCover.style.left = e.clientX + 'px';
+            bookCover.style.top = e.clientY + 'px';
+            bookCover.style.opacity = '1';
+            bookCover.classList.add('flicker');
+            cursor.classList.add('flicker');
+        });
+        
+        bookTitle.addEventListener('mouseleave', () => {
+            bookCover.style.opacity = '0';
+            bookCover.classList.remove('flicker');
+            cursor.classList.remove('flicker');
+        });
     }
-
-    // Update and draw pipes
-    for (let i = game.pipes.length - 1; i >= 0; i--) {
-        const pipe = game.pipes[i];
-        pipe.x -= game.speed;
-        drawPipes(pipe);
-
-        // Collision detection
-        if (checkCollision(pipe)) {
-            endGame();
-            return;
-        }
-
-        // Score tracking
-        if (!pipe.passed && pipe.x + game.pipeWidth < bird.x) {
-            game.score++;
-            pipe.passed = true;
-            document.getElementById("score").textContent = game.score;
-        }
-
-        // Remove offscreen pipes
-        if (pipe.x + game.pipeWidth < 0) {
-            game.pipes.splice(i, 1);
+    
+    interactiveElements.forEach(element => {
+        element.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        element.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+ 
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(page => page.classList.add('page-transition'));
+ 
+    function navigateTo(pageId) {
+        document.querySelectorAll('.page').forEach(page => {
+            page.classList.remove('active', 'visible');
+        });
+        
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+            setTimeout(() => targetPage.classList.add('visible'), 100);
+            
+          
+            const colors = {
+                'home': 'white',
+                'developer': '#FF4400',  
+                'writer': '#FF007F',     
+                'music': '#7CB518',      
+                'about': '#00A6FB',    
+                'cv': '#FFD23F',
+                'contact': '#000000'          
+            };
+            
+            document.body.style.backgroundColor = colors[pageId] || 'white';
+            
+            
+            if (pageId === 'contact') {
+                document.body.classList.add('light-text');
+            } else {
+                document.body.classList.remove('light-text');
+            }
         }
     }
-
-    // Draw bird
-    drawBird();
-
-    requestAnimationFrame(gameLoop);
-}
-
-function endGame() {
-    game.isRunning = false;
-    alert(Game Over! Punteggio: ${game.score});
-}
-
-// Event Listeners
-document.getElementById("start-btn").addEventListener("click", startGame);
-
-document.addEventListener("keydown", (event) => {
-    if (event.code === "Space") {
-        if (!game.isRunning) {
-            startGame();
+    
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-page]');
+        if (target) {
+            e.preventDefault();
+            navigateTo(target.dataset.page);
         }
-        jump();
-    }
+    });
+    
+    document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
+    document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
+ 
+    const projectCards = document.querySelectorAll('.project-card h3, .music-project h2');
+    const projectImages = {
+        'Neon Snake': 'fizzbuzz',
+        'Discord Clone': 'discord',
+        'Train Ticket Form': 'train',
+        'Dropbox Clone': 'dropbox',
+        'Antico Stradello': 'pizza',
+        'MALACARNE(TMC Crew)': 'malacarne',  
+        'JUAN LEE': 'semeiosis'
+    };
+ 
+    projectCards.forEach(card => {
+        const hoverImage = document.createElement('div');
+        hoverImage.className = `project-hover-image ${projectImages[card.textContent]}`;
+        document.body.appendChild(hoverImage);
+    
+        // Modifichiamo questa parte per gestire entrambi i tipi di container
+        const projectArea = card.closest('.project-card') || card.closest('.music-project');
+        
+        projectArea.addEventListener('mousemove', (e) => {
+            hoverImage.style.left = e.clientX + 'px';
+            hoverImage.style.top = e.clientY + 'px';
+            hoverImage.style.opacity = '1';
+            hoverImage.classList.add('flicker');
+            cursor.style.opacity = '0';
+        });
+    
+        projectArea.addEventListener('mouseleave', () => {
+            hoverImage.style.opacity = '0';
+            hoverImage.classList.remove('flicker');
+            cursor.style.opacity = '1';
+        });
+    });
+
+
+    const criticalText = document.querySelector('.text-item h3');
+    const textCover = document.createElement('div');
+    textCover.className = 'text-cover';
+    textCover.style.backgroundImage = "url('Licitra.png')";
+    document.body.appendChild(textCover);
+
+    criticalText.addEventListener('mousemove', (e) => {
+    textCover.style.left = e.clientX + 'px';
+    textCover.style.top = e.clientY + 'px';
+    textCover.style.opacity = '1';
+    textCover.classList.add('flicker');
+    cursor.style.opacity = '0';
+    });
+
+    criticalText.addEventListener('mouseleave', () => {
+    textCover.style.opacity = '0';
+    textCover.classList.remove('flicker');
+    cursor.style.opacity = '1';
+    });
+
+
 });
-
-canvas.addEventListener("click", () => {
-    if (!game.isRunning) {
-        startGame();
-    }
-    jump();
-});
-
