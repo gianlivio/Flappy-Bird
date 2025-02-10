@@ -1,7 +1,27 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-canvas.width = 400;
-canvas.height = 600;
+
+// Responsive canvas sizing
+function resizeCanvas() {
+    const container = document.querySelector('.game-container');
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight;
+    
+    // Maintain aspect ratio
+    const targetAspect = 400 / 600;
+    let newWidth, newHeight;
+    
+    if (containerWidth / containerHeight > targetAspect) {
+        newHeight = containerHeight;
+        newWidth = newHeight * targetAspect;
+    } else {
+        newWidth = containerWidth;
+        newHeight = newWidth / targetAspect;
+    }
+    
+    canvas.width = newWidth;
+    canvas.height = newHeight;
+}
 
 const bird = {
     x: 50,
@@ -24,7 +44,7 @@ const game = {
 };
 
 function resetGame() {
-    bird.y = 300;
+    bird.y = canvas.height / 2;
     bird.velocity = 0;
     game.pipes = [];
     game.score = 0;
@@ -45,7 +65,7 @@ function startGame() {
 }
 
 function createPipe() {
-    const minHeight = 100;
+    const minHeight = canvas.height * 0.2;
     const maxHeight = canvas.height - game.pipeGap - minHeight;
     const topHeight = Math.random() * (maxHeight - minHeight) + minHeight;
     
@@ -135,21 +155,37 @@ function endGame() {
     alert(`Game Over! Punteggio: ${game.score}`);
 }
 
-// Event Listeners
-document.getElementById("start-btn").addEventListener("click", startGame);
-
-document.addEventListener("keydown", (event) => {
-    if (event.code === "Space") {
-        if (!game.isRunning) {
-            startGame();
-        }
-        jump();
-    }
-});
-
-canvas.addEventListener("click", () => {
+// Event Listeners for multiple input methods
+function handleStart() {
     if (!game.isRunning) {
         startGame();
     }
     jump();
+}
+
+// Desktop events
+document.getElementById("start-btn").addEventListener("click", handleStart);
+document.addEventListener("keydown", (event) => {
+    if (event.code === "Space") {
+        handleStart();
+    }
 });
+
+// Mobile events
+canvas.addEventListener("touchstart", (event) => {
+    event.preventDefault(); // Prevent scrolling
+    handleStart();
+});
+
+// Prevent default touch behaviors
+document.body.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+document.body.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+
+// Resize handling
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas(); // Initial resize
+
+// Disable zoom
+document.addEventListener('gesturestart', (e) => e.preventDefault());
+document.addEventListener('gesturechange', (e) => e.preventDefault());
+document.addEventListener('gestureend', (e) => e.preventDefault());
