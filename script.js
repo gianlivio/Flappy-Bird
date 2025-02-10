@@ -1,4 +1,3 @@
-
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 canvas.width = 400;
@@ -133,7 +132,7 @@ function gameLoop() {
 
 function endGame() {
     game.isRunning = false;
-    alert(Game Over! Punteggio: ${game.score});
+    alert(`Game Over! Punteggio: ${game.score}`);
 }
 
 // Event Listeners
@@ -154,6 +153,3 @@ canvas.addEventListener("click", () => {
     }
     jump();
 });
-
-
-
