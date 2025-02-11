@@ -154,7 +154,7 @@ function gameLoop() {
         game.pipes.push(createPipe());
     }
 
-    // Update and draw pipes
+   // Update and draw pipes
     for (let i = game.pipes.length - 1; i >= 0; i--) {
         const pipe = game.pipes[i];
         pipe.x -= game.speed;
@@ -191,7 +191,6 @@ function endGame() {
     alert(`Game Over! Punteggio: ${game.score}`);
 }
 
-// Event Listeners for multiple input methods
 function handleStart() {
     if (game.gameOver) {
         resetGame();
@@ -208,17 +207,26 @@ function startGame() {
     gameLoop();
 }
 
-// Desktop events
+// Ottimizzazione per dispositivo
+function optimizeForDevice() {
+    const isMobile = window.innerWidth < 768;
+    game.pipeGenerationInterval = isMobile ? 150 : 120;
+}
+
+// Event Listeners
 document.getElementById("start-btn").addEventListener("click", handleStart);
+
+// Desktop events
 document.addEventListener("keydown", (event) => {
     if (event.code === "Space") {
+        event.preventDefault();
         handleStart();
     }
 });
 
 // Mobile events
 canvas.addEventListener("touchstart", (event) => {
-    event.preventDefault(); // Prevent scrolling
+    event.preventDefault();
     handleStart();
 });
 
@@ -227,10 +235,26 @@ document.body.addEventListener('touchmove', (e) => e.preventDefault(), { passive
 document.body.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
 
 // Resize handling
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas(); // Initial resize
+window.addEventListener('resize', () => {
+    resizeCanvas();
+    optimizeForDevice();
+});
 
-// Disable zoom
+// Orientation change
+window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+        resizeCanvas();
+        optimizeForDevice();
+    }, 100);
+});
+
+// Initialize
+window.addEventListener('load', () => {
+    resizeCanvas();
+    optimizeForDevice();
+});
+
+// Disable zoom on double tap
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 document.addEventListener('gesturechange', (e) => e.preventDefault());
 document.addEventListener('gestureend', (e) => e.preventDefault());
