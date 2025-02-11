@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Flappy Bird Clone</title>
+    <title>Flappy Glitch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="game-container">
         <h1>Flappy Glitch</h1>
-        <canvas id="gameCanvas" width="400" height="600"></canvas>
-        <p class="score">Punteggio: <span id="score">0</span></p>
-        <button id="start-btn">Inizia</button>
+        <canvas id="gameCanvas"></canvas>
+        <div class="game-ui">
+            <p class="score">Punteggio: <span id="score">0</span></p>
+            <button id="start-btn">Inizia</button>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
