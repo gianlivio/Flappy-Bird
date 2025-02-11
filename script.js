@@ -6,19 +6,54 @@ function resizeCanvas() {
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
     
-    const targetAspect = 400 / 600;
+    const isMobile = window.innerWidth < 768;
+    const isTablet = window.innerWidth >= 768 && window.innerWidth <= 1200;
+    
+    let targetAspect = 400 / 600;
+    
+    // Adatta l'aspect ratio in base al dispositivo
+    if (isMobile && window.innerHeight > window.innerWidth) {
+        targetAspect = 350 / 525;
+    } else if (isTablet) {
+        targetAspect = 450 / 675;
+    }
+    
     let newWidth, newHeight;
     
     if (containerWidth / containerHeight > targetAspect) {
-        newHeight = containerHeight;
+        newHeight = Math.min(containerHeight * 0.8, 600);
         newWidth = newHeight * targetAspect;
     } else {
-        newWidth = containerWidth;
+        newWidth = Math.min(containerWidth * 0.9, 400);
         newHeight = newWidth / targetAspect;
     }
     
-    canvas.width = newWidth;
-    canvas.height = newHeight;
+    // Gestione schermi ad alta densità
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = newWidth * dpr;
+    canvas.height = newHeight * dpr;
+    canvas.style.width = `${newWidth}px`;
+    canvas.style.height = `${newHeight}px`;
+    
+    // Scala il contesto per schermi ad alta densità
+    ctx.scale(dpr, dpr);
+    
+    // Aggiorna i parametri di gioco
+    adjustGameParameters(newWidth, newHeight);
+}
+
+function adjustGameParameters(width, height) {
+    const scale = width / 400;
+    
+    bird.width = Math.floor(30 * scale);
+    bird.height = Math.floor(30 * scale);
+    bird.gravity = 0.5 * scale;
+    bird.jumpStrength = -9 * scale;
+    bird.x = Math.floor(50 * scale);
+    
+    game.speed = 2 * scale;
+    game.pipeGap = Math.floor(200 * scale);
+    game.pipeWidth = Math.floor(50 * scale);
 }
 
 const bird = {
@@ -39,7 +74,8 @@ const game = {
     speed: 2,
     pipeGap: 200,
     pipeWidth: 50,
-    frameCount: 0
+    frameCount: 0,
+    pipeGenerationInterval: 120
 };
 
 function resetGame() {
@@ -93,12 +129,12 @@ function checkCollision(pipe) {
     const pipeRight = pipe.x + game.pipeWidth;
 
     const hitTopPipe = birdRight > pipe.x && 
-                       bird.x < pipeRight && 
-                       bird.y < pipe.topHeight;
+                      bird.x < pipeRight && 
+                      bird.y < pipe.topHeight;
 
     const hitBottomPipe = birdRight > pipe.x && 
-                          bird.x < pipeRight && 
-                          birdBottom > canvas.height - pipe.bottomHeight;
+                         bird.x < pipeRight && 
+                         birdBottom > canvas.height - pipe.bottomHeight;
 
     return hitTopPipe || hitBottomPipe || bird.y + bird.height > canvas.height || bird.y < 0;
 }
@@ -114,7 +150,7 @@ function gameLoop() {
 
     // Pipe generation
     game.frameCount++;
-    if (game.pipes.length === 0 || game.frameCount % 120 === 0) {
+    if (game.pipes.length === 0 || game.frameCount % game.pipeGenerationInterval === 0) {
         game.pipes.push(createPipe());
     }
 
