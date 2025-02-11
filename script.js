@@ -6,54 +6,67 @@ function resizeCanvas() {
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
     
-    const isMobile = window.innerWidth < 768;
-    const isTablet = window.innerWidth >= 768 && window.innerWidth <= 1200;
-    
-    let targetAspect = 400 / 600;
-    
-    // Adatta l'aspect ratio in base al dispositivo
-    if (isMobile && window.innerHeight > window.innerWidth) {
-        targetAspect = 350 / 525;
-    } else if (isTablet) {
-        targetAspect = 450 / 675;
-    }
+    const baseWidth = 400;
+    const baseHeight = 600;
+    const baseAspectRatio = baseWidth / baseHeight;
     
     let newWidth, newHeight;
     
-    if (containerWidth / containerHeight > targetAspect) {
-        newHeight = Math.min(containerHeight * 0.8, 600);
-        newWidth = newHeight * targetAspect;
-    } else {
-        newWidth = Math.min(containerWidth * 0.9, 400);
-        newHeight = newWidth / targetAspect;
+    // Mobile
+    if (window.innerWidth <= 767) {
+        if (window.innerHeight > window.innerWidth) {
+            // Portrait
+            newHeight = Math.min(containerHeight * 0.65, baseHeight);
+            newWidth = newHeight * baseAspectRatio;
+            
+            if (newWidth > containerWidth * 0.95) {
+                newWidth = containerWidth * 0.95;
+                newHeight = newWidth / baseAspectRatio;
+            }
+        } else {
+            // Landscape
+            newHeight = Math.min(containerHeight * 0.8, baseHeight);
+            newWidth = newHeight * baseAspectRatio;
+            
+            if (newWidth > containerWidth * 0.5) {
+                newWidth = containerWidth * 0.5;
+                newHeight = newWidth / baseAspectRatio;
+            }
+        }
+    }
+    // Tablet
+    else if (window.innerWidth <= 1199) {
+        newHeight = Math.min(containerHeight * 0.7, baseHeight);
+        newWidth = newHeight * baseAspectRatio;
+        
+        if (newWidth > containerWidth * 0.6) {
+            newWidth = containerWidth * 0.6;
+            newHeight = newWidth / baseAspectRatio;
+        }
+    }
+    // Desktop
+    else {
+        newHeight = Math.min(containerHeight * 0.75, baseHeight);
+        newWidth = newHeight * baseAspectRatio;
+        
+        if (newWidth > containerWidth * 0.4) {
+            newWidth = containerWidth * 0.4;
+            newHeight = newWidth / baseAspectRatio;
+        }
     }
     
-    // Gestione schermi ad alta densità
+    // Gestione DPI per schermi ad alta densità
     const dpr = window.devicePixelRatio || 1;
     canvas.width = newWidth * dpr;
     canvas.height = newHeight * dpr;
     canvas.style.width = `${newWidth}px`;
     canvas.style.height = `${newHeight}px`;
     
-    // Scala il contesto per schermi ad alta densità
+    // Scala il contesto per la risoluzione corretta
     ctx.scale(dpr, dpr);
     
     // Aggiorna i parametri di gioco
     adjustGameParameters(newWidth, newHeight);
-}
-
-function adjustGameParameters(width, height) {
-    const scale = width / 400;
-    
-    bird.width = Math.floor(30 * scale);
-    bird.height = Math.floor(30 * scale);
-    bird.gravity = 0.5 * scale;
-    bird.jumpStrength = -9 * scale;
-    bird.x = Math.floor(50 * scale);
-    
-    game.speed = 2 * scale;
-    game.pipeGap = Math.floor(200 * scale);
-    game.pipeWidth = Math.floor(50 * scale);
 }
 
 const bird = {
@@ -77,6 +90,20 @@ const game = {
     frameCount: 0,
     pipeGenerationInterval: 120
 };
+
+function adjustGameParameters(width, height) {
+    const scale = width / 400;
+    
+    bird.width = Math.floor(30 * scale);
+    bird.height = Math.floor(30 * scale);
+    bird.gravity = 0.5 * scale;
+    bird.jumpStrength = -9 * scale;
+    bird.x = Math.floor(50 * scale);
+    
+    game.speed = 2 * scale;
+    game.pipeGap = Math.floor(200 * scale);
+    game.pipeWidth = Math.floor(50 * scale);
+}
 
 function resetGame() {
     bird.y = canvas.height / 2;
@@ -154,7 +181,7 @@ function gameLoop() {
         game.pipes.push(createPipe());
     }
 
-   // Update and draw pipes
+    // Update and draw pipes
     for (let i = game.pipes.length - 1; i >= 0; i--) {
         const pipe = game.pipes[i];
         pipe.x -= game.speed;
@@ -254,7 +281,7 @@ window.addEventListener('load', () => {
     optimizeForDevice();
 });
 
-// Disable zoom on double tap
+// Disable zoom
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 document.addEventListener('gesturechange', (e) => e.preventDefault());
 document.addEventListener('gestureend', (e) => e.preventDefault());
