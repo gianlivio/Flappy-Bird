@@ -123,12 +123,18 @@ button:active {
     canvas {
         max-width: 60vw;
     }
+        .game-container {
+        height: 100vh;
+        overflow: hidden;
+    }
 }
 
 /* Mobile (<768px) */
 @media (max-width: 767px) {
     .game-container {
         padding: 0.5rem;
+          height: 100vh;
+        overflow: hidden;
     }
     
     canvas {
