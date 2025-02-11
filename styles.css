@@ -1,10 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Press+Start+2P&display=swap');
-
 :root {
     --primary-color: #00ffcc;
     --secondary-color: #ff00ff;
     --background-color: #0a0a0a;
     --accent-color: #00ffff;
+    --game-width: min(400px, 90vw);
+    --game-height: min(600px, 80vh);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
@@ -15,7 +21,10 @@ body {
     margin: 0;
     overflow: hidden;
     perspective: 1000px;
-    cursor: none; /* Custom cursor coming */
+    cursor: none;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .game-container {
@@ -28,6 +37,8 @@ body {
     justify-content: center;
     background: radial-gradient(circle at center, rgba(0,255,204,0.1), rgba(0,0,0,0.8));
     transform-style: preserve-3d;
+    gap: 1rem;
+    padding: 1rem;
 }
 
 h1 {
@@ -41,23 +52,7 @@ h1 {
         glitch 1.5s infinite alternate,
         cyber-flicker 0.1s infinite alternate;
     letter-spacing: 3px;
-}
-
-@keyframes glitch {
-    0% { 
-        transform: translate(-2px, -2px) skew(-3deg);
-        text-shadow: 4px 4px 0px var(--secondary-color), -4px -4px 0px var(--accent-color);
-    }
-    50% { 
-        transform: translate(2px, 2px) skew(2deg);
-        text-shadow: -4px -4px 0px var(--secondary-color), 4px 4px 0px var(--accent-color);
-    }
-}
-
-@keyframes cyber-flicker {
-    0% { opacity: 0.9; }
-    50% { opacity: 0.5; }
-    100% { opacity: 0.95; }
+    margin-bottom: 1rem;
 }
 
 canvas {
@@ -69,20 +64,22 @@ canvas {
         0 0 40px var(--accent-color);
     transition: all 0.3s ease;
     will-change: box-shadow, transform;
+    max-width: 100%;
+    height: auto;
+    touch-action: none;
 }
 
-canvas:hover {
-    transform: scale(1.02) rotate3d(1, 1, 0, 5deg);
-    box-shadow: 
-        0 0 20px var(--primary-color),
-        0 0 40px var(--secondary-color),
-        0 0 80px var(--accent-color);
+.game-ui {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 .score {
     font-family: 'Orbitron', sans-serif;
     font-size: 1.8rem;
-    margin-top: 15px;
     text-shadow: 0 0 10px var(--primary-color);
     letter-spacing: 2px;
 }
@@ -115,6 +112,23 @@ button:active {
     filter: brightness(1.2);
 }
 
+@keyframes glitch {
+    0% { 
+        transform: translate(-2px, -2px) skew(-3deg);
+        text-shadow: 4px 4px 0px var(--secondary-color), -4px -4px 0px var(--accent-color);
+    }
+    50% { 
+        transform: translate(2px, 2px) skew(2deg);
+        text-shadow: -4px -4px 0px var(--secondary-color), 4px 4px 0px var(--accent-color);
+    }
+}
+
+@keyframes cyber-flicker {
+    0% { opacity: 0.9; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0.95; }
+}
+
 /* Digital noise overlay */
 body::before {
     content: "";
@@ -135,20 +149,81 @@ body::before {
     opacity: 0.1;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2rem;
+/* Large screens (>1200px) */
+@media (min-width: 1201px) {
+    :root {
+        --game-width: min(500px, 40vw);
+        --game-height: min(750px, 70vh);
     }
     
-    .score {
-        font-size: 1.5rem;
-    }
-    
-    button {
-        font-size: 1rem;
-        padding: 10px 20px;
+    canvas:hover {
+        transform: scale(1.02) rotate3d(1, 1, 0, 5deg);
     }
 }
 
+/* Tablet screens (768px - 1200px) */
+@media (min-width: 768px) and (max-width: 1200px) {
+    :root {
+        --game-width: min(450px, 60vw);
+        --game-height: min(675px, 70vh);
+    }
+    
+    h1 {
+        font-size: 2.2rem;
+    }
+    
+    .score {
+        font-size: 1.6rem;
+    }
+}
 
+/* Mobile screens (<768px) */
+@media (max-width: 767px) {
+    :root {
+        --game-width: min(350px, 90vw);
+        --game-height: min(525px, 70vh);
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+        margin: 0.5rem 0;
+    }
+    
+    .score {
+        font-size: 1.2rem;
+    }
+    
+    button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+    
+    canvas:hover {
+        transform: none;
+    }
+}
+
+/* Landscape orientation */
+@media (max-height: 600px) and (orientation: landscape) {
+    .game-container {
+        padding: 0.5rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+        margin: 0.25rem 0;
+    }
+    
+    .game-ui {
+        flex-direction: row;
+        gap: 2rem;
+        margin-top: 0.5rem;
+    }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    canvas {
+        image-rendering: pixelated;
+    }
+}
